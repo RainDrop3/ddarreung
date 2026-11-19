@@ -1,0 +1,33 @@
+# 시크릿 키
+.env
+.env.*
+!.env.example
+
+# 로컬 데이터
+data/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Airflow 런타임
+airflow/logs/
+airflow/*.pid
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# 비공개 문서
+PROJECT.md
