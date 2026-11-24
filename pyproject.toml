@@ -7,7 +7,7 @@ name = "ddareungi"
 version = "0.1.0"
 description = "따릉이 데이터 엔지니어링 포트폴리오"
 requires-python = ">=3.11"
-dependencies = ["boto3", "requests"]
+dependencies = ["boto3", "requests", "pyarrow"]
 
 [project.optional-dependencies]
 dev = ["pytest"]
