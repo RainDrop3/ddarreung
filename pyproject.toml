@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ddareungi"
+version = "0.1.0"
+description = "따릉이 데이터 엔지니어링 포트폴리오"
+requires-python = ">=3.11"
+dependencies = ["boto3", "requests"]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
