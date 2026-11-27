@@ -95,6 +95,24 @@ http://openapi.seoul.go.kr:8088/{KEY}/{TYPE}/{SERVICE}/{START_INDEX}/{END_INDEX}
 6. **스냅샷 1개의 크기**: JSON 원본 약 0.5MB 추정, gzip 후 약 93KB (2,742개 대여소). 하루 288회면 약 27MB, 한 달 약 0.8GB, 7일 보관분 약 190MB.
 7. 데이터셋 페이지의 "대여소 수 1,471개소('18.11월말)"는 옛 수치.
 
+## 저장: landing → raw
+
+| 단계 | 경로 | 내용 | 보관 |
+|---|---|---|---|
+| landing | `landing/realtime/dt=YYYY-MM-DD/HHMM.json.gz` | 5분 슬롯 하나의 응답 원본 + `slot`, `fetched_at` | 7일 후 자동 삭제 |
+| raw | `raw/realtime/dt=YYYY-MM-DD/snapshots.parquet` | 하루치를 합친 파일, 대여소 × 슬롯당 한 행 | 계속 |
+
+raw 컬럼은 `slot`, `fetched_at`(timestamp, Asia/Seoul)과 응답의 `row[]` 필드 7개(이름·값 그대로, 문자열)다. 응답에 필드가 새로 생기면 컬럼으로 추가하고, 있던 필드가 빠지면 실패시킨다.
+
+compaction(`realtime_compact` DAG, 매시 20분)의 규칙:
+
+- landing에 남아 있는 **끝난 날짜**(다음 날 00:15 이후)를 모두 확인한다. 실행하지 못한 날이 있어도 다음 실행이 따라잡는다.
+- 객체 메타데이터 `slot-count`와 landing의 슬롯 수가 같으면 건너뛴다.
+- landing의 슬롯 수가 더 적으면 덮어쓰지 않는다. lifecycle 삭제가 시작된 날짜를 다시 합치면 온전한 파일이 일부만 남은 데이터로 바뀌기 때문이다.
+- 7일 넘게 실행되지 않으면 그 날짜는 영구 손실이다.
+
+수집기가 꺼져 있던 시간은 슬롯이 없다. 시간대별 집계를 할 때는 날짜별 슬롯 수(`count(distinct slot)`, 하루 최대 288)를 함께 확인한다.
+
 ## 미검증 항목
 
 - `stationId` 인자로 단일 대여소 조회
