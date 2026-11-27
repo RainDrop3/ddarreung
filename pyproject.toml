@@ -10,7 +10,7 @@ requires-python = ">=3.11"
 dependencies = ["boto3", "requests", "pyarrow"]
 
 [project.optional-dependencies]
-dev = ["pytest"]
+dev = ["pytest", "tzdata; sys_platform == 'win32'"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
